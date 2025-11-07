@@ -22,6 +22,13 @@
       "when": 1761627254053,
       "tag": "0002_calm_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1761783802065,
+      "tag": "0003_jittery_old_lace",
+      "breakpoints": true
     }
   ]
 }

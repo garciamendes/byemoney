@@ -4,8 +4,8 @@ import { users } from "./user";
 export const accounts = pgTable("accounts", {
   id: uuid("id").defaultRandom().primaryKey(),
 
-  accountId: uuid("account_id").defaultRandom().notNull(),
-  providerId: uuid("provider_id").defaultRandom().notNull(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
 
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
