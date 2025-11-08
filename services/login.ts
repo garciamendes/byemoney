@@ -1,16 +1,53 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { z } from "zod";
 
-export async function login(data: FormData) {
-  console.log("login function called with data:", data);
+type FormState = {
+  email?: string;
+  password?: string;
+  success?: boolean;
+  errors?: Record<string, string[]>;
+};
 
-  await auth.api.signInEmail({
-    body: {
-      email: "test@example.com",
-      password: "dev",
-      callbackURL: "/",
-      rememberMe: true,
-    },
-  });
+const dataSchema = z.object({
+  email: z.email({ error: "Email inválido" }),
+  password: z.string({ error: "Campo senha é obrigatório" })
+});
+
+export async function login(prev: FormState, formData: FormData): Promise<FormState> {
+  const input = Object.fromEntries(formData.entries());
+
+  const parsed = dataSchema.safeParse(input);
+  if (!parsed.success) {
+    const flat = z.flattenError(parsed.error);
+    return {
+      ...prev,
+      errors: flat.fieldErrors,
+      success: false,
+    };
+  }
+
+  const { email, password } = parsed.data;
+  try {
+    await auth.api.signInEmail({
+      body: {
+        email,
+        password,
+      },
+    });
+
+    return {
+      email,
+      success: true,
+      errors: undefined,
+    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    return {
+      ...prev,
+      errors: { global: [e?.message ?? "Erro ao tentar logar, verifique seu email/senha"] },
+      success: false,
+    };
+  }
 }

@@ -1,69 +1,74 @@
-"use client";
+'use client'
 
-import { Input } from "@/components/input";
-import { register } from "@/services/registe";
-import { getError } from "@/utils/getErrors";
-import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import Input from "@/components/inputCustom"
+import { Button } from "@/components/retroui/Button"
+import { register } from "@/services/register"
+import { getError } from "@/utils/getErrors"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useActionState, useEffect } from "react"
+import { toast } from "sonner"
 
 export default function RegisterPage() {
   const router = useRouter()
   const [state, handleAction, pedding] = useActionState(register, {})
 
   useEffect(() => {
-    if (!state?.success) return
+    if (!state.success) {
+      toast.error('Erro ao tentar criar novo usuário')
+      return
+    }
 
     router.replace('/')
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.email])
+  }, [state.errors, state.success])
 
   return (
-    <div className="flex items-center justify-center h-screen bg-slate-950">
-      <form
-        action={handleAction}
-        className="bg-slate-900 w-96 h-auto flex flex-col gap-5 p-10 rounded-lg"
-      >
-        <h1 className="text-2xl text-white text-center font-semibold">Criar Conta</h1>
+    <div className="h-full w-full flex">
+      <div className="hidden lg:flex w-2/5 h-full bg-primary justify-center items-center">
+        <h3>REGISTRAR</h3>
+      </div>
 
-        <Input
-          name="name"
-          placeholder="Nome"
-          type="text"
-          className="border border-slate-500 bg-transparent text-white px-3 py-2 rounded outline-none"
-          error={getError(state?.errors, 'name')}
-        />
+      <div className="flex flex-col h-full items-center justify-center mx-auto px-5 w-full lg:w-1/3">
+        <form action={handleAction} className="flex flex-col w-full h-full justify-center items-center gap-5">
+          <Input
+            type="text"
+            name="name"
+            id="name"
+            label="Nome"
+            placeholder="Exemplo"
+            error={getError(state.errors, 'name')}
+          />
 
-        <Input
-          name="email"
-          placeholder="E-mail"
-          type="email"
-          className="border border-slate-500 bg-transparent text-white px-3 py-2 rounded"
-          error={state?.errors?.email?.[0]}
-        />
+          <Input
+            type="email"
+            name="email"
+            id="email"
+            label="Email"
+            placeholder="Exemplo@example.com"
+            error={getError(state.errors, 'email')}
+          />
 
-        <Input
-          name="password"
-          placeholder="Senha"
-          type="password"
-          className="border border-slate-500 bg-transparent text-white px-3 py-2 rounded"
-          error={getError(state?.errors, 'password')}
-        />
+          <Input
+            type="password"
+            name="password"
+            id="password"
+            label="Senha"
+            placeholder={'•'.repeat(10)}
+            error={getError(state.errors, 'password')}
+          />
 
-        <button
-          type="submit"
-          className="bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition-all"
-          disabled={pedding}
-        >
-          {pedding ? 'Carregando...' : 'Criar'}
-        </button>
+          <div className="flex flex-col w-full gap-4">
+            <Button
+              className="flex justify-center items-center w-full"
+              type="submit">
+              Registrar
+            </Button>
 
-        <p className="text-slate-400 text-sm text-center">
-          Já tem conta?{" "}
-          <a href="/login" className="text-indigo-400 hover:underline">
-            Entrar
-          </a>
-        </p>
-      </form>
+            <Link className="text-foreground hover:underline w-max" href={'/login'}>Já tem login?</Link>
+          </div>
+        </form>
+      </div>
     </div>
-  );
+  )
 }

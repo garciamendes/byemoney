@@ -1,6 +1,6 @@
 {
-  "id": "926d74e6-0e96-49a0-a845-b8e1710476fe",
-  "prevId": "0d85bd95-ca3d-495d-88ea-e144ad405c86",
+  "id": "d9b0dd5c-0990-441f-8656-315971891b98",
+  "prevId": "cb642f19-611e-47ae-95f3-5b6c7b8f8e13",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -17,13 +17,13 @@
         },
         "account_id": {
           "name": "account_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "provider_id": {
           "name": "provider_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -133,6 +133,19 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -147,6 +160,58 @@
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.categoriesToInvoices": {
+      "name": "categoriesToInvoices",
+      "schema": "",
+      "columns": {
+        "invoice_id": {
+          "name": "invoice_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "categoriesToInvoices_invoice_id_invoices_id_fk": {
+          "name": "categoriesToInvoices_invoice_id_invoices_id_fk",
+          "tableFrom": "categoriesToInvoices",
+          "tableTo": "invoices",
+          "columnsFrom": [
+            "invoice_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "categoriesToInvoices_category_id_categories_id_fk": {
+          "name": "categoriesToInvoices_category_id_categories_id_fk",
+          "tableFrom": "categoriesToInvoices",
+          "tableTo": "categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -180,13 +245,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "is_paid": {
-          "name": "is_paid",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
         "paid_at": {
           "name": "paid_at",
           "type": "timestamp",
@@ -200,11 +258,12 @@
           "notNull": false,
           "default": "'none'"
         },
-        "category_id": {
-          "name": "category_id",
-          "type": "uuid",
+        "installments": {
+          "name": "installments",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": 1
         },
         "user_id": {
           "name": "user_id",
@@ -228,19 +287,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "invoices_category_id_categories_id_fk": {
-          "name": "invoices_category_id_categories_id_fk",
-          "tableFrom": "invoices",
-          "tableTo": "categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "invoices_user_id_users_id_fk": {
           "name": "invoices_user_id_users_id_fk",
           "tableFrom": "invoices",
