@@ -32,6 +32,8 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  --color-paided: var(--paided);
+  --color-paided-foreground: var(--paided-foreground);
 }
 
 :root {
@@ -52,6 +54,10 @@
   --destructive: #e63946;
   --destructive-foreground: #fff;
   --border: #000;
+  --paided: #62d92a;
+  --paided-foreground: #fff;
+  --black: #000;
+  --black-foreground: #fff;
 }
 
 .dark {
@@ -81,5 +87,11 @@
   html,
   body {
     @apply bg-background text-foreground h-full w-full;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }

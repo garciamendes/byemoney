@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { mapError } from "@/shared/errors/errorMapper";
 import { z } from "zod";
 
 type FormState = {
@@ -44,9 +45,11 @@ export async function login(prev: FormState, formData: FormData): Promise<FormSt
     };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
+    const mapped = mapError(e['body'])
+
     return {
       ...prev,
-      errors: { global: [e?.message ?? "Erro ao tentar logar, verifique seu email/senha"] },
+      errors: { global: [mapped.message] },
       success: false,
     };
   }

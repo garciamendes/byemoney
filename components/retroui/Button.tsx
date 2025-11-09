@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { cva, VariantProps } from "class-variance-authority";
 import React, { ButtonHTMLAttributes } from "react";
 import { Slot } from "@radix-ui/react-slot";
+import { Loader } from "./Loader";
 
 const buttonVariants = cva(
   "font-head transition-all rounded outline-hidden cursor-pointer duration-200 font-medium flex items-center",
@@ -32,8 +33,9 @@ const buttonVariants = cva(
 
 export interface IButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  loading?: boolean
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, IButtonProps>(
@@ -44,6 +46,7 @@ export const Button = React.forwardRef<HTMLButtonElement, IButtonProps>(
       className = "",
       variant = "default",
       asChild = false,
+      loading = false,
       ...props
     }: IButtonProps,
     forwardedRef,
@@ -55,7 +58,7 @@ export const Button = React.forwardRef<HTMLButtonElement, IButtonProps>(
         className={cn(buttonVariants({ variant, size }), className)}
         {...props}
       >
-        {children}
+        {loading ? <Loader className="h-max [&>div]:border-foreground" size={size === 'icon' ? 'sm' : size} /> : children}
       </Comp>
     );
   },

@@ -10,6 +10,11 @@ export const auth = betterAuth({
     usePlural: true,
   }),
   plugins: [nextCookies()],
+  user: {
+    additionalFields: {
+      theme: { type: "string", defaultValue: "light" },
+    },
+  },
   advanced: {
     database: {
       generateId: false,

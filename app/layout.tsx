@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Archivo_Black, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
+import { ThemeProvider } from "@/context/theme";
 
 const archivoBlack = Archivo_Black({
   subsets: ["latin"],
@@ -29,9 +31,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${archivoBlack.variable} ${space.variable} antialiased dark`}
+        className={`${archivoBlack.variable} ${space.variable} antialiased`}
       >
-        {children}
+        <Toaster richColors />
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
