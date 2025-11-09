@@ -1,9 +1,8 @@
 'use client'
 
-import Input from "@/components/inputCustom"
+import { Input } from "@/components/input"
 import { Button } from "@/components/retroui/Button"
 import { login } from "@/services/login"
-import { register } from "@/services/register"
 import { getError } from "@/utils/getErrors"
 import Link from "next/link"
 import { useRouter } from "next/navigation"

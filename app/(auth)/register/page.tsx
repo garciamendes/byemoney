@@ -1,6 +1,6 @@
 'use client'
 
-import Input from "@/components/inputCustom"
+import { Input } from "@/components/input"
 import { Button } from "@/components/retroui/Button"
 import { register } from "@/services/register"
 import { getError } from "@/utils/getErrors"

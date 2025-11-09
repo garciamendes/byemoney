@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo_Black, Space_Grotesk } from "next/font/google";
+import 'react-day-picker/dist/style.css'
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/context/theme";
@@ -31,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${archivoBlack.variable} ${space.variable} antialiased`}
+        className={`${archivoBlack.variable} ${space.variable} antialiased text-black font-bold`}
       >
         <Toaster richColors />
         <ThemeProvider>

@@ -1,7 +1,10 @@
+import { Option } from "@/components/select";
+
 export const DEBT = {
   CART: 1,
   LOAN: 2,
   FINANCING: 3,
+  RECURRENCE: 4,
 } as const;
 export type DEBT_TYPE = typeof DEBT[keyof typeof DEBT];
 
@@ -9,7 +12,11 @@ export const DEBT_TITLE: Record<DEBT_TYPE, string> = {
   [DEBT.CART]: "Cartão",
   [DEBT.LOAN]: "Empréstimo",
   [DEBT.FINANCING]: "Financiamento",
+  [DEBT.RECURRENCE]: "Recorrência",
 };
+export const DEBT_OPTIONS: Option[] = Object.entries(DEBT_TITLE).map(
+  ([key, value]) => ({ label: value, value: key })
+);
 
 export const STATUS_INVOICE = {
   OPEN: 1,
