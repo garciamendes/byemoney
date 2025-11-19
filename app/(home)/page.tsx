@@ -5,7 +5,6 @@ import { Button } from "@/components/retroui/Button"
 import {
   Table,
 } from "@/components/retroui/Table"
-import { Tooltip } from "@/components/tooltipCustom"
 import { formatToMoney } from "@/utils"
 import {
   DEBT,
@@ -49,67 +48,51 @@ export default function HomePage() {
   const { setOpenCreateInvoice } = useInvoice()
 
   return (
-    <div className="flex flex-col gap-3.5 px-2">
+    <div className="flex flex-col gap-3.5 px-2 w-full">
       <div className="flex gap-2 justify-end items-center">
-        <Tooltip legend={
-          <div className="flex items-center gap-1.5">
-            Ou
-            <kbd className="bg-muted text-muted-foreground pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none">
-              <span className="text-xs">CTRL + SHIFT</span> + V
-            </kbd>
+        <Button className="flex flex-col" onClick={() => setOpenCreateInvoice(true)}>
+          <div className="flex items-center gap-2 text-primary-foreground">
+            Adicionar Fatura
           </div>
-        }>
-          <Button className="flex flex-col" onClick={() => setOpenCreateInvoice(true)}>
-            <div className="flex items-center gap-2">
-              <PlusIcon size={25} />
-              Adicionar Fatura
-            </div>
-          </Button>
-        </Tooltip>
+        </Button>
       </div>
 
-      <Table className="mb-6 mx-auto">
-        <Table.Header>
-          <Table.Row>
-            <Table.Head className="w-[400px]">Fatura</Table.Head>
-            <Table.Head className="text-center">Valor Total</Table.Head>
-            <Table.Head className="text-center">Dívida</Table.Head>
-            <Table.Head className="text-center">parcelas</Table.Head>
-            <Table.Head className="text-center">Status</Table.Head>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {invoices.map((invoice, index) => (
-            <Table.Row key={index}>
-              <Table.Cell className="font-medium">{invoice.invoice}</Table.Cell>
-              <Table.Cell className="text-center">{formatToMoney(invoice.totalAmount)}</Table.Cell>
-              <Table.Cell className="text-center">{DEBT_TITLE[invoice.debt as DEBT_TYPE]}</Table.Cell>
-              <Table.Cell className="text-center">
-                <Tooltip legend="Quantidade / Quantidade Pagas">
-                  <div>
-                    {invoice.installments}/{invoice.total_installments_paided}
-                  </div>
-                </Tooltip>
-              </Table.Cell>
-              <Table.Cell className="text-center">
-                <Badge
-                  variant="solid"
-                  size="sm"
-                  color={invoice.status}>
-                  {STATUS_INVOICE_TITLE[invoice.status as STATUS_INVOICE_TYPE]}
-                </Badge>
-              </Table.Cell>
+      <div className="w-full overflow-x-auto">
+        <Table className="mb-6 mx-auto w-screen md:w-full">
+          <Table.Header>
+            <Table.Row>
+              <Table.Head className="w-[400px]">Fatura</Table.Head>
+              <Table.Head className="text-center">Valor Total</Table.Head>
+              <Table.Head className="text-center">Dívida</Table.Head>
+              <Table.Head className="text-center">Status</Table.Head>
             </Table.Row>
-          ))}
-        </Table.Body>
+          </Table.Header>
+          <Table.Body>
+            {invoices.map((invoice, index) => (
+              <Table.Row key={index}>
+                <Table.Cell className="font-medium">{invoice.invoice}</Table.Cell>
+                <Table.Cell className="text-center">{formatToMoney(invoice.totalAmount)}</Table.Cell>
+                <Table.Cell className="text-center">{DEBT_TITLE[invoice.debt as DEBT_TYPE]}</Table.Cell>
+                <Table.Cell className="text-center">
+                  <Badge
+                    variant="solid"
+                    size="sm"
+                    color={invoice.status}>
+                    {STATUS_INVOICE_TITLE[invoice.status as STATUS_INVOICE_TYPE]}
+                  </Badge>
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
 
-        <Table.Footer>
-          <Table.Row>
-            <Table.Cell colSpan={4} className="text-paided-foreground">Total</Table.Cell>
-            <Table.Cell className="text-center text-paided-foreground">{formatToMoney(250)}</Table.Cell>
-          </Table.Row>
-        </Table.Footer>
-      </Table>
+          <Table.Footer>
+            <Table.Row>
+              <Table.Cell colSpan={3} className="text-paided-foreground">Total</Table.Cell>
+              <Table.Cell className="text-center text-paided-foreground">{formatToMoney(250)}</Table.Cell>
+            </Table.Row>
+          </Table.Footer>
+        </Table>
+      </div>
 
       <div className="flex gap-2.5 items-center justify-end">
         <Button>Voltar</Button>

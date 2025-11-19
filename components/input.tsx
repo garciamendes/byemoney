@@ -84,6 +84,7 @@ export const Input = forwardRef<
         const formatted = formatMoney(parsed)
         setDisplay(formatted)
         onValueChange?.(parsed)
+        props.onChange?.(e)
       } else {
         setDisplay(raw)
         props.onChange?.(e)

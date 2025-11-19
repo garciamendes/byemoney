@@ -12,3 +12,15 @@ export const formatToMoney = (
 
   return formatted.format(value);
 };
+
+export function parseBRLMoneyToNumber(value: string): number | null {
+  if (!value) return null;
+
+  const onlyDigits = value.replace(/\D/g, "");
+
+  if (onlyDigits.length === 0) return null;
+
+  const intValue = Number(onlyDigits) / 100;
+
+  return intValue;
+}

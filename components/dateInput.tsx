@@ -112,7 +112,14 @@ export function DatePicker({
               !value && 'text-muted-foreground font-light'
             )}
           >
-            <span className='text-foreground'>{labelText}</span>
+            <span
+              className={
+                cn(
+                  'text-foreground',
+                  !value && 'text-muted-foreground font-light'
+                )}>
+              {labelText}
+            </span>
             <CalendarIcon className="ml-2 h-4 w-4 opacity-70 text-foreground" />
           </Button>
         </Popover.Trigger>

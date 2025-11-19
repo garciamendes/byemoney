@@ -10,6 +10,7 @@ import { Command } from './retroui/Command'
 import { CommandEmpty, CommandGroup, CommandItem, CommandList } from 'cmdk'
 import { Popover } from './retroui/Popover'
 import { Label } from './retroui/Label'
+import { Loader } from './retroui/Loader'
 
 export type Option = {
   label: string
@@ -23,7 +24,10 @@ interface SelectProps {
   label?: string
   placeholder?: string
   multiple?: boolean
+  loading?: boolean
   defaultValue?: string[] | string
+  value?: string[] | string
+  onChange?: (value: string[] | string) => void
   /** Se true, transforma hidden input em "a,b,c" em vez de JSON */
   csvValue?: boolean
   classNameWrapper?: string | undefined
@@ -38,23 +42,46 @@ export function Select({
   multiple = false,
   defaultValue = multiple ? [] : '',
   csvValue = false,
+  loading = false,
+  onChange,
+  value,
   classNameWrapper
 }: SelectProps) {
   const [open, setOpen] = React.useState(false)
+  const controlled = value !== undefined
 
   const [selected, setSelected] = React.useState<string[]>(
-    multiple ? (defaultValue as string[]) : defaultValue ? [defaultValue as string] : []
+    controlled
+      ? (Array.isArray(value) ? value : value ? [value] : [])
+      : multiple
+        ? (defaultValue as string[])
+        : defaultValue
+          ? [defaultValue as string]
+          : []
   )
 
+  React.useEffect(() => {
+    if (controlled) {
+      setSelected(Array.isArray(value) ? value : value ? [value] : [])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
   const toggleValue = (val: string) => {
+    let newValues: string[]
+
     if (multiple) {
-      setSelected((prev) =>
-        prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val]
-      )
+      newValues = selected.includes(val)
+        ? selected.filter((v) => v !== val)
+        : [...selected, val]
     } else {
-      setSelected([val])
+      newValues = [val]
       setOpen(false)
     }
+
+    if (!controlled) setSelected(newValues)
+
+    onChange?.(multiple ? newValues : newValues[0])
   }
 
   const selectedLabels = options.filter((o) => selected.includes(o.value))
@@ -87,15 +114,22 @@ export function Select({
       <input type="hidden" id={id} name={name} value={hiddenValue} readOnly />
 
       <Popover open={open} onOpenChange={setOpen}>
-        <Popover.Trigger className='text-black text-base px-4 py-2' asChild>
+        <Popover.Trigger disabled={loading} className='text-black text-base px-4 py-2' asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
             className="w-full justify-between min-h-10 px-4 py-2 text-foreground"
           >
-            {displayValue}
-            <CaretDownIcon className="ml-2 h-4 w-4 opacity-50 text-foreground" />
+            {!loading ? (
+              <>
+                {displayValue}
+
+                <CaretDownIcon className="ml-2 h-4 w-4 opacity-50 text-foreground" />
+              </>
+            ) : (
+              <Loader size='sm' />
+            )}
           </Button>
         </Popover.Trigger>
 
