@@ -49,7 +49,7 @@ export async function login(prev: FormState, formData: FormData): Promise<FormSt
 
     return {
       ...prev,
-      errors: { global: [mapped.message] },
+      errors: { global: [mapped.message as string] },
       success: false,
     };
   }

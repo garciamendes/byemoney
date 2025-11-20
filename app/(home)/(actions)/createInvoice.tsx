@@ -15,10 +15,15 @@ import { cn } from "@/lib/utils"
 import { DatePicker } from "@/components/dateInput"
 import { useCategories } from "@/hooks/categories"
 import { IINvoiceForm } from "@/shared/types"
-import { format, formatISO } from "date-fns"
+import { formatISO } from "date-fns"
 
 export const CreateInvoice = () => {
-  const { openCreateInvoice, setOpenCreateInvoice } = useInvoice()
+  const {
+    openCreateInvoice,
+    setOpenCreateInvoice,
+    handleCreateInvoice,
+    loadingCreateInvoice
+  } = useInvoice()
   const { categories, loading: loadingCategories } = useCategories()
   const [invoiceForm, setInvoiceForm] = useState<IINvoiceForm>({
     name: '',
@@ -40,7 +45,7 @@ export const CreateInvoice = () => {
       'value': parseBRLMoneyToNumber(String(invoiceForm.value))
     }
 
-    console.log(data)
+    handleCreateInvoice(data)
   }
 
   return (
@@ -148,7 +153,13 @@ export const CreateInvoice = () => {
           onChange={e => handlerChangeInvoiceForm('dueDate', formatISO(String(e)))}
         />
 
-        <Button className="col-span-2 justify-center" type="submit">Criar Fatura</Button>
+        <Button
+          className="col-span-2 justify-center h-14"
+          // disabled={loadingCreateInvoice}
+          // loading={loadingCreateInvoice}
+          type="submit">
+          Criar Fatura
+        </Button>
       </form>
     </div>
   )

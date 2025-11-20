@@ -7,6 +7,7 @@ type ErrorCode =
   | 'UNKNOWN_ERROR'
   | 'INVALID_EMAIL_OR_PASSWORD'
   | 'INVALID_THEME'
+  | 'ZOD_ERROR'
 
 type ErrorMap = Record<ErrorCode, string>
 
@@ -17,10 +18,11 @@ const errorMessages: ErrorMap = {
   INTERNAL_SERVER_ERROR: 'Erro interno. Tente novamente mais tarde',
   INVALID_EMAIL_OR_PASSWORD: 'Erro ao tentar logar, verifique seu email/senha',
   UNKNOWN_ERROR: 'Algo deu errado. Tente novamente',
-  INVALID_THEME: 'Tema invalido'
+  INVALID_THEME: 'Tema invalido',
+  ZOD_ERROR: ''
 }
 
-export function mapError(error: unknown): { code: ErrorCode; message: string } {
+export function mapError(error: unknown): { code: ErrorCode; message: string | string[] | Record<string, string[]|string> } {
   // Tenta detectar o tipo do erro
   if (typeof error === 'object' && error !== null) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,6 +34,14 @@ export function mapError(error: unknown): { code: ErrorCode; message: string } {
       if (status === 401) return { code: 'UNAUTHORIZED', message: errorMessages.UNAUTHORIZED }
       if (status === 422) return { code: 'VALIDATION_ERROR', message: errorMessages.VALIDATION_ERROR }
       if (status >= 500) return { code: 'INTERNAL_SERVER_ERROR', message: errorMessages.INTERNAL_SERVER_ERROR }
+    }
+
+    if (err.code && err.code === 'ZOD_ERROR' as ErrorCode) {
+      console.log('ERROR: ', err)
+      return {
+        code: err.code,
+        message: err.error
+      }
     }
 
     if (err.code && errorMessages[err.code as ErrorCode]) {
