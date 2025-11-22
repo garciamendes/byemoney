@@ -4,9 +4,9 @@ import * as React from 'react'
 import { Popover } from '@/components/retroui/Popover'
 import { Button } from '@/components/retroui/Button'
 import { Label } from '@/components/retroui/Label'
-import { CalendarIcon, Clock } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
+import { format, formatISO } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Calendar } from './calendar'
 
@@ -19,8 +19,9 @@ interface DatePickerProps {
   mode?: Mode
   placeholder?: string
   classNameWrapper?: string
-  value?: Date | { from?: Date; to?: Date } | null
-  onChange?: (value: Date | { from?: Date; to?: Date } | null) => void
+  error?: string
+  value?: string | { from?: string; to?: string } | null
+  onChange?: (value: string | { from?: string; to?: string } | null) => void
 }
 
 export function DatePicker({
@@ -30,6 +31,7 @@ export function DatePicker({
   mode = 'date',
   placeholder = 'Selecione uma data',
   classNameWrapper,
+  error,
   value: controlledValue,
   onChange,
 }: DatePickerProps) {
@@ -89,11 +91,11 @@ export function DatePicker({
   const hiddenValue =
     isRange && value && typeof value === 'object' && 'from' in value
       ? JSON.stringify({
-        from: value.from ? value.from.toISOString() : null,
-        to: value.to ? value.to.toISOString() : null,
+        from: value.from ? formatISO(value.from) : null,
+        to: value.to ? formatISO(value.to) : null,
       })
-      : value instanceof Date
-        ? value.toISOString()
+      : typeof value === 'string'
+        ? formatISO(value)
         : ''
 
   return (
@@ -103,26 +105,31 @@ export function DatePicker({
       <input type="hidden" id={id} name={name} value={hiddenValue} readOnly />
 
       <Popover open={open} onOpenChange={setOpen}>
-        <Popover.Trigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              'w-full min-h-10 px-3 py-2 border-2 border-border',
-              'flex items-center justify-between text-left shadow-md',
-              !value && 'text-muted-foreground font-light'
-            )}
-          >
-            <span
-              className={
-                cn(
-                  'text-foreground',
-                  !value && 'text-muted-foreground font-light'
-                )}>
-              {labelText}
-            </span>
-            <CalendarIcon className="ml-2 h-4 w-4 opacity-70 text-foreground" />
-          </Button>
-        </Popover.Trigger>
+        <>
+          <Popover.Trigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                'w-full min-h-10 px-3 py-2 border-2 border-border',
+                'flex items-center justify-between text-left shadow-md',
+                !value && 'text-muted-foreground font-light'
+              )}
+            >
+              <span
+                className={
+                  cn(
+                    'text-foreground',
+                    !value && 'text-muted-foreground font-light'
+                  )}>
+                {labelText}
+              </span>
+              <CalendarIcon className="ml-2 h-4 w-4 opacity-70 text-foreground" />
+            </Button>
+
+          </Popover.Trigger>
+
+          {error && <p className="text-sm text-red-500">{error}</p>}
+        </>
 
         <Popover.Content
           className="w-max p-0"

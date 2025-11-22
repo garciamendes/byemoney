@@ -26,11 +26,12 @@ interface SelectProps {
   multiple?: boolean
   loading?: boolean
   defaultValue?: string[] | string
-  value?: string[] | string
+  value?: string[] | string | undefined | null
   onChange?: (value: string[] | string) => void
   /** Se true, transforma hidden input em "a,b,c" em vez de JSON */
   csvValue?: boolean
   classNameWrapper?: string | undefined
+  error?: string
 }
 
 export function Select({
@@ -45,7 +46,8 @@ export function Select({
   loading = false,
   onChange,
   value,
-  classNameWrapper
+  classNameWrapper,
+  error
 }: SelectProps) {
   const [open, setOpen] = React.useState(false)
   const controlled = value !== undefined
@@ -114,24 +116,29 @@ export function Select({
       <input type="hidden" id={id} name={name} value={hiddenValue} readOnly />
 
       <Popover open={open} onOpenChange={setOpen}>
-        <Popover.Trigger disabled={loading} className='text-black text-base px-4 py-2' asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between min-h-10 px-4 py-2 text-foreground"
-          >
-            {!loading ? (
-              <>
-                {displayValue}
+        <>
+          <Popover.Trigger disabled={loading} className='text-black text-base px-4 py-2' asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between min-h-10 px-4 py-2 text-foreground"
+            >
+              {!loading ? (
+                <>
+                  {displayValue}
 
-                <CaretDownIcon className="ml-2 h-4 w-4 opacity-50 text-foreground" />
-              </>
-            ) : (
-              <Loader size='sm' />
-            )}
-          </Button>
-        </Popover.Trigger>
+                  <CaretDownIcon className="ml-2 h-4 w-4 opacity-50 text-foreground" />
+                </>
+              ) : (
+                <Loader size='sm' />
+              )}
+            </Button>
+
+          </Popover.Trigger>
+
+          {error && <p className="text-sm text-red-500">{error}</p>}
+        </>
 
         <Popover.Content className="w-(--radix-popover-trigger-width) p-0">
           <Command>

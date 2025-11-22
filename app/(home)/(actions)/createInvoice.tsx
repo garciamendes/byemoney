@@ -5,48 +5,49 @@ import { Button } from "@/components/retroui/Button"
 import { useInvoice } from "@/hooks/invoice"
 import { formatToMoney, parseBRLMoneyToNumber } from "@/utils"
 import { XIcon } from "@phosphor-icons/react"
-import { DEBT_OPTIONS } from "../constants"
 import { Select } from "@/components/select"
 import { Input } from "@/components/input"
 import { Label } from "@/components/retroui/Label"
 import { Switch } from "@/components/retroui/Switch"
-import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { DatePicker } from "@/components/dateInput"
 import { useCategories } from "@/hooks/categories"
-import { IINvoiceForm } from "@/shared/types"
-import { formatISO } from "date-fns"
+import { CreateInvoiceSchehma, IInvoiceForm } from "@/shared/types"
+import { Controller, useForm, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { DEBT_OPTIONS } from "../constants"
+import { DatePicker } from "@/components/dateInput"
 
 export const CreateInvoice = () => {
   const {
     openCreateInvoice,
     setOpenCreateInvoice,
     handleCreateInvoice,
-    loadingCreateInvoice
   } = useInvoice()
-  const { categories, loading: loadingCategories } = useCategories()
-  const [invoiceForm, setInvoiceForm] = useState<IINvoiceForm>({
-    name: '',
-    value: null,
-    isInstallments: false,
-    typeDebt: null,
-    amountInstallments: null,
-    categories: [],
-    dueDate: ''
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(CreateInvoiceSchehma)
   })
 
-  const handlerChangeInvoiceForm = (name: string, value: string | number | string[] | boolean) => {
-    setInvoiceForm(prev => ({ ...prev, [name]: value }))
+  const { categories, loading: loadingCategories } = useCategories()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handlerSubmitInvoice = (data: IInvoiceForm) => {
+    console.log(data)
+    // const dataInvoice: IInvoiceForm = {
+    //   ...data,
+    //   'value': parseBRLMoneyToNumber(String(data.value)) as number
+    // }
+
+    // handleCreateInvoice(dataInvoice)
   }
 
-  const handlerSubmitInvoice = () => {
-    const data = {
-      ...invoiceForm,
-      'value': parseBRLMoneyToNumber(String(invoiceForm.value))
-    }
-
-    handleCreateInvoice(data)
-  }
+  const hasInstallments = useWatch({ control, name: 'isInstallments' })
 
   return (
     <div
@@ -65,96 +66,131 @@ export const CreateInvoice = () => {
       <Divider />
 
       <form
-        onSubmit={e => {
-          e.preventDefault()
-          handlerSubmitInvoice()
-        }}
+        onSubmit={handleSubmit(handlerSubmitInvoice)}
         className="grid grid-cols-1 lg:grid-cols-2 mt-5 gap-4">
         <Input
-          type="text"
-          name='name'
+          {...register('name')}
           id="name"
           label="Nome da Fatura"
           classNameWrapper="col-span-2"
-          onChange={e => handlerChangeInvoiceForm(e.target.name, e.target.value)}
-          value={invoiceForm.name}
           placeholder="Example"
+          error={errors.name?.message}
         />
 
         <Input
-          money
-          name="value"
+          {...register('value')}
           id="value"
           label="Valor Total"
-          onChange={e => handlerChangeInvoiceForm(e.target.name, e.target.value)}
-          value={invoiceForm.value as number}
-          placeholder={formatToMoney(100)}
+          type="number"
+          error={errors.value?.message}
+          onChange={e => {
+            const num = Number(e.target.value)
+
+            // CHAMA O onChange DO RHF!!!
+            register('value').onChange(e)
+
+            // GARANTE QUE É NUMBER
+            setValue('value', num, { shouldValidate: true })
+          }}
+          placeholder="100"
         />
 
         <div className="flex items-center gap-1.5 mt-6">
-          <Switch
-            id="installments"
-            checked={invoiceForm.isInstallments}
-            onCheckedChange={e => handlerChangeInvoiceForm('isInstallments', e)}
+          <Controller
+            control={control}
+            name="isInstallments"
+            rules={{
+              required: true
+            }}
+            render={({ field }) => (
+              <Switch
+                id="installments"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            )}
           />
 
-          <Label htmlFor="installments" className="cursor-pointer select-none">
+          <Label
+            htmlFor="installments"
+            className="cursor-pointer select-none">
             Parcelado?
           </Label>
         </div>
 
-        <Select
-          classNameWrapper={cn('hidden col-span-2', invoiceForm.isInstallments ? 'block' : '')}
-          name="installmentsCount"
-          placeholder="Quantidade de parcelas"
-          options={Array.from({ length: 100 }).map((_, i) => ({
-            label: `${i + 1}x`,
-            value: String(i + 1),
-          }))}
-          value={String(invoiceForm.amountInstallments)}
-          onChange={(v) =>
-            handlerChangeInvoiceForm('amountInstallments', Number(v))
-          }
+        <Controller
+          control={control}
+          name="amountInstallments"
+          render={({ field }) => (
+            <Select
+              {...field}
+              classNameWrapper={cn('hidden col-span-2', hasInstallments ? 'block' : '')}
+              placeholder="Quantidade de parcelas"
+              label="Quantidade de parcelas"
+              value={String(field.value)}
+              options={Array.from({ length: 100 }).map((_, i) => ({
+                label: `${i + 1}x`,
+                value: String(i + 1),
+              }))}
+            />
+          )}
         />
 
-        <Select
-          name="debt"
-          id="debt"
-          label="Tipo da dívida"
-          classNameWrapper="col-span-2"
-          options={DEBT_OPTIONS}
-          value={String(invoiceForm.typeDebt)}
-          onChange={(v) =>
-            handlerChangeInvoiceForm('typeDebt', Number(v))
-          }
+
+        <Controller
+          control={control}
+          name="typeDebt"
+          render={({ field }) => (
+            <Select
+              {...field}
+              id="debt"
+              label="Tipo da dívida"
+              classNameWrapper="col-span-2"
+              options={DEBT_OPTIONS}
+              error={errors.typeDebt?.message}
+              value={String(field.value)}
+              onChange={val => field.onChange(Number(val))}
+            />
+          )}
         />
 
-        <Select
+        <Controller
+          control={control}
           name="categories"
-          id="categories"
-          label="Categorias"
-          multiple
-          loading={loadingCategories}
-          placeholder="Selecione um ou mais categoria(s)"
-          classNameWrapper="col-span-2"
-          options={categories}
-          value={invoiceForm.categories}
-          onChange={(v) =>
-            handlerChangeInvoiceForm('categories', v)
-          }
+          render={({ field }) => (
+            <Select
+              {...field}
+              id="categories"
+              label="Categorias"
+              multiple
+              loading={loadingCategories}
+              placeholder="Selecione um ou mais categoria(s)"
+              classNameWrapper="col-span-2"
+              error={errors.categories?.message}
+              options={categories}
+              value={field.value}
+            />
+          )}
         />
 
-        <DatePicker
-          classNameWrapper="col-span-2"
+        <Controller
+          control={control}
           name="dueDate"
-          id="dueDate"
-          label="Data de vencimento"
-          mode="date"
-          onChange={e => handlerChangeInvoiceForm('dueDate', formatISO(String(e)))}
+          render={({ field }) => (
+            <DatePicker
+              {...field}
+              id="dueDate"
+              label="Data de vencimento"
+              value={field.value}
+              classNameWrapper="col-span-2"
+              onChange={(date) => field.onChange(date)}
+              error={errors.dueDate?.message}
+            />
+          )}
         />
 
         <Button
-          className="col-span-2 justify-center h-14"
+          className="col-span-2 justify-center h-12"
           // disabled={loadingCreateInvoice}
           // loading={loadingCreateInvoice}
           type="submit">

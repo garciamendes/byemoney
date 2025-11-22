@@ -22,7 +22,8 @@ const errorMessages: ErrorMap = {
   ZOD_ERROR: ''
 }
 
-export function mapError(error: unknown): { code: ErrorCode; message: string | string[] | Record<string, string[]|string> } {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mapError(error: unknown): { code: ErrorCode; message: any } {
   // Tenta detectar o tipo do erro
   if (typeof error === 'object' && error !== null) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,9 +38,8 @@ export function mapError(error: unknown): { code: ErrorCode; message: string | s
     }
 
     if (err.code && err.code === 'ZOD_ERROR' as ErrorCode) {
-      console.log('ERROR: ', err)
       return {
-        code: err.code,
+        code: 'ZOD_ERROR',
         message: err.error
       }
     }

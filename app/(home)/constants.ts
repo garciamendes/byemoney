@@ -1,5 +1,14 @@
 import { Option } from "@/components/select";
 
+/**
+ * Tipos de dívida utilizados no sistema.
+ *
+ * Use `DEBT.<TYPE>` para selecionar a categoria correspondente.
+ * - DEBT.CART - Cartão
+ * - DEBT.LOAN - Empréstimo
+ * - DEBT.FINANCING - Financiamento
+ * - DEBT.RECURRENCE - Recorrência / Assinatura
+ */
 export const DEBT = {
   CART: 1,
   LOAN: 2,
